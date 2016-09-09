@@ -1,0 +1,41 @@
+
+.insta-inputs {
+    display: inline-block;
+    width: 100%;
+}
+
+.insta-login {
+  border-radius: 3px;
+  border-style: solid;
+  border-width: 1px;
+  background: 0 0;
+  border-color: #3897f0;
+  color: #3897f0;
+  cursor: pointer;
+  font-weight: 600;
+  outline: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /*width: 100%;*/
+  -webkit-appearance: none;
+  line-height: 29px;
+  padding: 0 11px;
+  font-size: 16px;
+  float:right;
+  display: block;
+}
+
+.insta-shows a {
+    display: inline-block;
+    margin-bottom: 8px;
+    width: calc(50% - 4px);
+    margin-right: 8px;
+    text-decoration: none;
+    color: black;
+}
+
+.insta-shows {
+    display: flex;
+    flex-wrap: wrap;
+}
