@@ -12,6 +12,7 @@ class InstaWidget extends WP_Widget {
   public function widget( $args, $instance ) {
 
     $title = apply_filters( 'widget_title', $instance['title'] );
+    $layout = (isset($instance['layout'])) ? intval($instance['layout']) : 6;
     $token = $instance['token'];
     $data = call_user_implicit($token, 'media');
 
@@ -21,10 +22,13 @@ class InstaWidget extends WP_Widget {
     ?>
     <div class="insta-shows">
       <?php
-      for($i = 0; $i < 9; $i++){
-        $imgUrl = $data[$i]['images']['thumbnail']['url'];
+      for($i = 0; $i < $layout; $i++){
+        $imgUrl = $data[$i]['images']['standard_resolution']['url'];
         $imgLink = $data[$i]['link'];
         $imgTitle = $data[$i]['caption']['text'];
+        $qtdWords = nthstrpos($imgTitle, ' ', 7);
+        $imgTitle = ($qtdWords > 0) ? substr($imgTitle, 0, $qtdWords) : $imgTitle;
+
         echo sprintf('<a href="%s" target="_blank" ><figure><img src="%s" alt="%s" /><figcaption>%s</figcaption></figure></a>', $imgLink, $imgUrl, $imgTitle, $imgTitle);
       }
        ?>
@@ -45,24 +49,33 @@ class InstaWidget extends WP_Widget {
 
     if ( isset( $instance[ 'title' ] ) ) {
       $title = $instance[ 'title' ];
+      $layout = (isset($instance['layout'])) ? intval($instance['layout']) : 6;
       $token = $instance['token'];
       $user = $instance['user'];
       $insta = call_user_implicit($token);
     }
     else {
       $title = __('InstaWidget');
+      $layout = 6;
     }
     ?>
     <p>
       <label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:' ); ?></label>
       <input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
+      <label for="<?php echo $this->get_field_id('layout'); ?>"><?php _e('Layout:'); ?></label>
+      <select class="widefat" name="<?php echo $this->get_field_name('layout') ?>" id="<?php echo $this->get_field_id('layout')?>">
+        <option value="2" <?php selected( $layout, 2 ); ?>>2 <?php _e('images'); ?></option>
+        <option value="4" <?php selected( $layout, 4 ); ?>>4 <?php _e('images'); ?></option>
+        <option value="6" <?php selected( $layout, 6 ); ?>>6 <?php _e('images'); ?></option>
+        <option value="8" <?php selected( $layout, 8 ); ?>>8 <?php _e('images'); ?></option>
+      </select>
       <input type="hidden" id="loginUrl" value="<?php echo $loginUrl; ?>" />
       <input type="hidden" id="<?php echo $this->get_field_id( 'token' ); ?>" name="<?php echo $this->get_field_name( 'token' ); ?>" value="<?php echo esc_attr( $token ); ?>"/>
       <input type="hidden" id="<?php echo $this->get_field_id( 'user' ); ?>" name="<?php echo $this->get_field_name( 'user' ); ?>" value="<?php echo esc_attr( $user ); ?>">
     </p>
     <p class="insta-inputs">
       <?php if( ! empty( $instance[ 'user' ] ) ) : ?>
-          <label for="insta-username"><b>Username:</b> <?php echo $insta->username ?></label>
+          <label for="insta-username"><b>Username:</b> <?php echo $insta['username'] ?></label>
           <a href="javascript:void(0)" class="insta-remove">Remover</a>
       <?php else: ?>
         <a class="insta-login" href="<?php echo $loginUrl; ?>">Login</a>
@@ -75,6 +88,7 @@ class InstaWidget extends WP_Widget {
   public function update( $new_instance, $old_instance ) {
     $instance = array();
     $instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
+    $instance['layout'] = intval($new_instance['layout']);
     $instance['token'] = ( ! empty( $new_instance['token'] ) ) ? strip_tags( $new_instance['token'] ) : '';
     $instance['user'] = ( ! empty( $new_instance['user'] ) ) ? strip_tags( $new_instance['user'] ) : '';
     return $instance;
